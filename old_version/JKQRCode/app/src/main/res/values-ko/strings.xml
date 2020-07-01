@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JK QR코드 리더</string>
+    <string name="action_settings">설정</string>
+    <string name="copy_to_clipboard">클립보드로 복사되었습니다</string>
+    <string name="action_exit">종료</string>
+</resources>

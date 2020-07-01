@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">JK QRCode Reader</string>
+    <string name="action_settings">Settings</string>
+    // AdMob 하단광고ID
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-0843163070431190/8137294260</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="copy_to_clipboard">Contents copied to Clipboard</string>
+    <string name="action_exit">Exit</string>
+</resources>

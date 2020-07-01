@@ -1,0 +1,89 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.smok95.jkqrcode.ScanResultFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:background="@color/colorPopupBack">
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:id="@+id/tvFormat"
+            android:layout_alignParentTop="true"
+            android:textSize="20dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:background="@android:color/background_light"
+            android:layout_margin="2dp" />
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:id="@+id/tvContents"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_below="@+id/tvFormat"
+            android:textSize="18dp"
+            android:textColor="#000000"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textIsSelectable="true"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_above="@+id/btnCopy" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/btnCopy"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/tvContents"
+            android:layout_alignStart="@+id/tvContents"
+            android:background="@drawable/ic_copy" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/btnShare"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/btnCopy"
+            android:layout_toEndOf="@+id/btnCopy"
+            android:background="@drawable/ic_share" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/btnClose"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_close" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/btnSearch"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/btnShare"
+            android:layout_toEndOf="@+id/btnShare"
+            android:background="@drawable/ic_search" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/btnWeb"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/btnSearch"
+            android:layout_toEndOf="@+id/btnSearch"
+            android:background="@drawable/ic_open_in_browser" />
+
+    </RelativeLayout>
+</LinearLayout>
