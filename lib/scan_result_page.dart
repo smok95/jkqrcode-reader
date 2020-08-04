@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'app_localizations.dart';
+import 'my_local.dart';
 import 'my_admob.dart';
 import 'my_icon_button.dart' as my;
 
@@ -41,7 +41,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    final String title = AppLocalizations.of(context).scanResult;
+    final String title = MyLocal.of(context).scanResult;
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -69,10 +69,10 @@ class _ScanResultPageState extends State<ScanResultPage> {
   }
 
   Widget _controlPanel(String text) {
-    final copy = AppLocalizations.of(context).copy;
-    final share = AppLocalizations.of(context).share;
-    final search = AppLocalizations.of(context).search;
-    final open = AppLocalizations.of(context).open;
+    final copy = MyLocal.of(context).copy;
+    final share = MyLocal.of(context).share;
+    final search = MyLocal.of(context).search;
+    final open = MyLocal.of(context).open;
     final iconSize = 40.0;
 
     List<Widget> children = List<Widget>();
@@ -118,15 +118,15 @@ class _ScanResultPageState extends State<ScanResultPage> {
       children: [
         ListTile(
           leading: Icon(Icons.content_copy),
-          title: Text(AppLocalizations.of(context).copy),
+          title: Text(MyLocal.of(context).copy),
         ),
         ListTile(
           leading: Icon(Icons.share),
-          title: Text(AppLocalizations.of(context).share),
+          title: Text(MyLocal.of(context).share),
         ),
         ListTile(
           leading: Icon(Icons.search),
-          title: Text(AppLocalizations.of(context).search),
+          title: Text(MyLocal.of(context).search),
         ),
         ListTile(
           leading: my.MyIconButton(Icons.open_in_browser, "Open"),

@@ -1,20 +1,39 @@
 import 'dart:convert';
 
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
+import 'package:jkqrcode/my_private_data.dart';
+import 'package:jkqrcode/settings_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'my_admob.dart';
-import 'app_localizations.dart';
+import 'my_local.dart';
 import 'scan_result_page.dart';
 import 'my_theme.dart';
 
-void main() {
+/// 전면카메라 존재 유무
+Future<bool> checkFrontCamera() async {
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
+  final features = androidInfo?.systemFeatures ?? null;
+  if (features == null) return false;
+  return features.indexOf('android.hardware.camera.front') != -1;
+}
+
+bool hasFrontCamera = false;
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //jktest
+  hasFrontCamera = await checkFrontCamera();
 
   // AdMob 초기화
   MyAdmob.initialize();
@@ -32,11 +51,10 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-    return MaterialApp(
-      onGenerateTitle: (BuildContext context) =>
-          AppLocalizations.of(context).title,
+    return GetMaterialApp(
+      onGenerateTitle: (BuildContext context) => MyLocal.of(context).title,
       localizationsDelegates: [
-        const AppLocalizationsDelegate(),
+        const MyLocalDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
@@ -88,18 +106,53 @@ class _MyHomePageState extends State<MyHomePage> {
     _controller.toggleFlash();
   }
 
+  void _flipCamera() {
+    if (_controller == null) return;
+    _controller.flipCamera();
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> actions = List<Widget>();
+    if (hasFrontCamera) {
+      actions.add(
+          IconButton(icon: Icon(Icons.switch_camera), onPressed: _flipCamera));
+    }
+    actions.add(IconButton(
+        icon: Icon(_flashOn ? Icons.flash_off : Icons.flash_on),
+        tooltip: _flashOn ? 'Flash Off' : 'Flash On',
+        onPressed: _onFlashOnOff));
+
+    actions.add(Padding(padding: EdgeInsets.all(10.0)));
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).title),
-        actions: [
-          IconButton(
-              icon: Icon(_flashOn ? Icons.flash_off : Icons.flash_on),
-              tooltip: _flashOn ? 'Flash Off' : 'Flash On',
-              onPressed: _onFlashOnOff),
-          Padding(padding: EdgeInsets.all(10.0)),
-        ],
+        title: Text(MyLocal.of(context).title),
+        actions: actions,
+        leading: IconButton(
+            icon: Icon(Icons.more_vert),
+            onPressed: () {
+              Get.to(SettingsPage(
+                onSettingChange: (name, value) {
+                  String cmd;
+                  String text;
+                  if (name == 'share app') {
+                    cmd = 'share';
+                    text = MyPrivateData.playStoreUrl;
+                  } else if (name == 'rate review') {
+                    cmd = 'open';
+                    text = MyPrivateData.playStoreUrl;
+                  } else if (name == 'more apps') {
+                    cmd = 'open';
+                    text = MyPrivateData.googlePlayDeveloperPageUrl;
+                  } else {
+                    return;
+                  }
+
+                  _runCommand(cmd, text);
+                },
+              ));
+            }),
       ),
       body: SafeArea(
         child: Column(
@@ -126,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         break;
       case 'search':
-        final google = AppLocalizations.of(context).google_url;
+        final google = MyLocal.of(context).google_url;
         final encoded = Uri.encodeFull('https://${google}/search?q=${text}');
         if (await canLaunch(encoded)) {
           await launch(encoded);
