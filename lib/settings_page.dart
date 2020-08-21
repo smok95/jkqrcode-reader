@@ -7,15 +7,23 @@ import 'my_local.dart';
 typedef DarkModeCallback = void Function(bool darkMode);
 typedef SettingChangeCallback = void Function(String name, dynamic value);
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   final DarkModeCallback onToggleDarkMode;
   final SettingChangeCallback onSettingChange;
 
-  SettingsPage({this.onToggleDarkMode, this.onSettingChange});
+  /// 진동기능 사용여부
+  bool useVibrate;
 
+  SettingsPage({this.onToggleDarkMode, this.onSettingChange, this.useVibrate});
+
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
   void _fireChange(final String name, dynamic value) {
-    if (onSettingChange != null) {
-      onSettingChange(name, value);
+    if (widget.onSettingChange != null) {
+      widget.onSettingChange(name, value);
     }
   }
 
@@ -33,6 +41,21 @@ class SettingsPage extends StatelessWidget {
         sections: [
           SettingsSection(
             //title: 'Section',
+            tiles: [
+              SettingsTile.switchTile(
+                  leading: Icon(Icons.vibration),
+                  title: lo('vibrate'),
+                  onToggle: (use) {
+                    setState(() {
+                      widget.useVibrate = use;
+                      _fireChange('vibrate', use);
+                    });
+                  },
+                  switchValue: widget.useVibrate),
+            ],
+          ),
+          SettingsSection(
+            //title: '',
             tiles: [
               SettingsTile(
                   leading: Icon(Icons.rate_review),

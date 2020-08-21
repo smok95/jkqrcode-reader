@@ -25,6 +25,9 @@ class MyLocal {
       'rate review': 'Rate 5 stars',
       'more apps': 'More apps',
       'app info': 'About this app',
+      'vibrate': 'Vibrate',
+      'ean13 country flag notice':
+          'The first three digits of the EAN-13 (GS1 Prefix) usually identify the GS1 Member Organization which the manufacturer has joined\n(not necessarily where the product is actually made).',
     },
     'ko': {
       'title': 'JK QR코드 리더',
@@ -41,6 +44,9 @@ class MyLocal {
       'rate review': '별점주기',
       'more apps': '다른 앱 보기',
       'app info': '앱 정보',
+      'vibrate': '진동 알림',
+      'ean13 country flag notice':
+          '현재 인식된 바코드를 발급한 국가(또는 지역)의 정보이며, 제품의 원산지 정보는 아닙니다.',
     },
   };
 

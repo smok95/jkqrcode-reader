@@ -1,10 +1,14 @@
+import 'package:flag/flag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jkqrcode/barcode_detail/country_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'my_local.dart';
 import 'my_admob.dart';
 import 'my_icon_button.dart' as my;
+import 'barcode_detail/barcode_detail.dart';
 
 /// 버튼 터치 이벤트
 /// 버튼 터치시 해당 이벤트가 발생하며, [buttonName]과 스캔값인 [text]가 인자로 전달된다.
@@ -15,9 +19,11 @@ class ScanResultPage extends StatefulWidget {
   final String text;
   // 스캔코드 형식
   final String format;
+  final BarcodeDetail detail;
   final ButtonPressCallback onButtonPress;
 
-  ScanResultPage({Key key, this.text, this.format, this.onButtonPress})
+  ScanResultPage(
+      {Key key, this.text, this.format, this.onButtonPress, this.detail})
       : super(key: key);
 
   @override
@@ -26,6 +32,7 @@ class ScanResultPage extends StatefulWidget {
 
 class _ScanResultPageState extends State<ScanResultPage> {
   bool _canLaunch = false;
+  Widget _countries;
 
   @override
   void initState() {
@@ -37,11 +44,77 @@ class _ScanResultPageState extends State<ScanResultPage> {
         _canLaunch = value;
       });
     });
+
+    if (widget.detail != null) {
+      List<CountryInfo> countryInfos;
+      if (widget.detail.format == BarcodeFormat.ean13) {
+        final info = widget.detail?.detail as EAN13Detail;
+        countryInfos = info?.countries;
+      } else if (widget.detail.format == BarcodeFormat.upc_a) {
+        final info = widget.detail?.detail as UPCADetail;
+        countryInfos = info?.countries;
+      }
+
+      if (countryInfos != null) {
+        _countries = Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: countryInfos
+              .map((country) => _buildFlagWithName(country.code, country.name))
+              .toList(),
+        );
+      }
+    }
+  }
+
+  Widget _buildFlagWithName(final String code, final String name) {
+    try {
+      return Container(
+          padding: EdgeInsets.only(left: 5),
+          child: Row(
+            children: [
+              SizedBox(
+                  width: 42,
+                  height: 25,
+                  child: Flag(code, height: 25, width: 42)),
+              Text(
+                ' ' + name,
+                style: TextStyle(fontSize: 15),
+              )
+            ],
+          ));
+    } catch (e) {
+      print(e.toString());
+      return SizedBox.shrink();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final String title = MyLocal.of(context).scanResult;
+    final lo = MyLocal.of(context).text;
+    final String title = lo('scan result');
+    Widget suffix;
+    if (_countries != null) {
+      suffix = GestureDetector(
+        child: _countries,
+        onTap: () {
+          Get.defaultDialog(
+              title: "Infomation",
+              content: Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text(lo('ean13 country flag notice'))));
+          /*
+          Get.snackbar(
+              'EAN13 GS1 Company Prefix', lo('ean13 country flag notice'),
+              duration: Duration(seconds: 20),
+              icon: Icon(Icons.info_outline),
+              shouldIconPulse: false,
+              mainButton: FlatButton(
+                  onPressed: () => Get.back(), child: Icon(Icons.close)));
+                  */
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -53,7 +126,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
             margin: EdgeInsets.all(10.0),
             child: Column(children: [
               Expanded(
-                child: _resultCard(widget.text, widget.format),
+                child: _resultCard(widget.text, widget.format, suffix: suffix),
               ),
               MyAdmob.createAdmobBanner2(),
               _controlPanel(widget.text),
@@ -113,65 +186,53 @@ class _ScanResultPageState extends State<ScanResultPage> {
         children: children,
       ),
     );
-
-    return ListView(
-      children: [
-        ListTile(
-          leading: Icon(Icons.content_copy),
-          title: Text(MyLocal.of(context).copy),
-        ),
-        ListTile(
-          leading: Icon(Icons.share),
-          title: Text(MyLocal.of(context).share),
-        ),
-        ListTile(
-          leading: Icon(Icons.search),
-          title: Text(MyLocal.of(context).search),
-        ),
-        ListTile(
-          leading: my.MyIconButton(Icons.open_in_browser, "Open"),
-          title: Text("Open"),
-        )
-      ],
-    );
   }
 
-  Card _resultCard(String text, String format) {
-    return Card(
-        child: Column(
-      children: <Widget>[
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            child: Text(
-              widget.format,
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-            ),
-            margin: EdgeInsets.all(20.0),
-          ),
-        ),
+  Widget _resultCard(String text, String format, {Widget suffix}) {
+    return Column(
+      children: [
+        Card(
+            color: Colors.grey[100],
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.format,
+                        style: TextStyle(
+                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                      ),
+                      if (suffix != null) suffix,
+                    ]),
+                margin: EdgeInsets.all(10),
+              ),
+            )),
         Expanded(
-          child: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.all(10.0),
-              child: Column(
-                children: <Widget>[
-                  TextField(
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none),
-                    readOnly: true,
-                    maxLines: null,
-                    controller: TextEditingController(text: widget.text),
-                  ),
-                ],
+          child: Card(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  children: <Widget>[
+                    TextField(
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none),
+                      readOnly: true,
+                      maxLines: null,
+                      controller: TextEditingController(text: widget.text),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        )
       ],
-    ));
+    );
   }
 }

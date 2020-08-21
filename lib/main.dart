@@ -6,12 +6,16 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:jkqrcode/my_private_data.dart';
-import 'package:jkqrcode/settings_page.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vibration/vibration.dart';
 
+import 'barcode_detail/barcode_detail.dart';
+import 'my_private_data.dart';
+import 'settings_page.dart';
 import 'my_admob.dart';
 import 'my_local.dart';
 import 'scan_result_page.dart';
@@ -28,9 +32,13 @@ Future<bool> checkFrontCamera() async {
 }
 
 bool hasFrontCamera = false;
+Box box;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  box = await Hive.openBox('settings');
 
   //jktest
   hasFrontCamera = await checkFrontCamera();
@@ -76,10 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _qrKey = GlobalKey(debugLabel: 'QR');
   bool _alreadyPushed = false;
   bool _flashOn = false;
+  bool _vibrateOn = true;
 
   @override
   void initState() {
     super.initState();
+
+    if (box != null) {
+      _vibrateOn = box.get('vibrate') ?? true;
+    }
   }
 
   /// QRView 생성
@@ -133,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.more_vert),
             onPressed: () {
               Get.to(SettingsPage(
+                useVibrate: _vibrateOn,
                 onSettingChange: (name, value) {
                   String cmd;
                   String text;
@@ -145,6 +159,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   } else if (name == 'more apps') {
                     cmd = 'open';
                     text = MyPrivateData.googlePlayDeveloperPageUrl;
+                  } else if (name == 'vibrate') {
+                    _vibrateOn = value as bool;
+                    if (box != null) {
+                      box.put('vibrate', _vibrateOn);
+                    }
+                    return;
                   } else {
                     return;
                   }
@@ -191,20 +211,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// 코드 스캔결과 화면에 표시
   void _showScanData(String format, String text) async {
-    final route = ModalRoute.of(context);
-    print('route name=${route?.settings?.name}');
-
     if (_alreadyPushed) return;
 
     _alreadyPushed = true;
-    await Navigator.push(
-        this.context,
-        MaterialPageRoute(
-            builder: (context) => ScanResultPage(
-                  text: text,
-                  format: format,
-                  onButtonPress: _runCommand,
-                )));
+
+    // 바코드 상세정보 생성
+    BarcodeDetail info;
+    try {
+      info = await BarcodeDetail.create(format, text);
+    } catch (e) {
+      print(e.toString());
+    }
+
+    _vibrate();
+    await Get.to(ScanResultPage(
+        text: text, format: format, detail: info, onButtonPress: _runCommand));
 
     _alreadyPushed = false;
     _controller?.resumeCamera();
@@ -216,8 +237,13 @@ class _MyHomePageState extends State<MyHomePage> {
     controller.scannedDataStream.listen((scanData) {
       var json = jsonDecode(scanData);
       if (json != null) {
-        controller.pauseCamera();
-        _showScanData(json['format'], json['text']);
+        var format = json['format'];
+        final text = json['text'] as String;
+        if (format == null) format = '';
+        if (text != null && text.length > 0) {
+          controller.pauseCamera();
+          _showScanData(format, text);
+        }
       }
     });
   }
@@ -226,5 +252,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     _controller?.dispose();
     super.dispose();
+  }
+
+  void _vibrate() async {
+    if (!_vibrateOn) return;
+
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate();
+    }
   }
 }
