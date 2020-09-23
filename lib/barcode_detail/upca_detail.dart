@@ -1,9 +1,11 @@
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter_localized_country_name/flutter_localized_country_name.dart';
+import 'package:jkqrcode/barcode_detail/barcode_detail.dart';
 
 import 'country_info.dart';
 
-class UPCADetail {
-  UPCADetail(this.countries);
+class UPCADetail extends BarcodeDetail {
+  UPCADetail(String code, {this.countries}) : super(BarcodeFormat.upcA, code);
 
   final List<CountryInfo> countries;
 
@@ -20,6 +22,6 @@ class UPCADetail {
       }).toList());
     }
 
-    return UPCADetail(countries);
+    return UPCADetail(code, countries: countries);
   }
 }

@@ -14,6 +14,7 @@ class MyLocal {
       'title': 'JK QRCode Reader',
       'scan result': 'Scan Result',
       'copy': 'Copy',
+      'keep the screen on': 'Keep the screen on',
       'share': 'Share',
       'search': 'Search',
       'open': 'Open',
@@ -26,6 +27,7 @@ class MyLocal {
       'more apps': 'More apps',
       'app info': 'About this app',
       'vibrate': 'Vibrate',
+      'view code': 'View code',
       'ean13 country flag notice':
           'The first three digits of the EAN-13 (GS1 Prefix) usually identify the GS1 Member Organization which the manufacturer has joined\n(not necessarily where the product is actually made).',
     },
@@ -33,6 +35,7 @@ class MyLocal {
       'title': 'JK QR코드 리더',
       'scan result': '스캔 결과',
       'copy': '복사',
+      'keep the screen on': '화면을 켜진 상태로 유지',
       'share': '공유',
       'search': '검색',
       'open': '열기',
@@ -45,8 +48,9 @@ class MyLocal {
       'more apps': '다른 앱 보기',
       'app info': '앱 정보',
       'vibrate': '진동 알림',
+      'view code': '코드 보기',
       'ean13 country flag notice':
-          '현재 인식된 바코드를 발급한 국가(또는 지역)의 정보이며, 제품의 원산지 정보는 아닙니다.',
+          '바코드를 발급한 국가(또는 지역)의 정보이며, 제품의 원산지 정보는 아닙니다.',
     },
   };
 

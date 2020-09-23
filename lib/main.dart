@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:screen/screen.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
@@ -40,7 +41,6 @@ void main() async {
   await Hive.initFlutter();
   box = await Hive.openBox('settings');
 
-  //jktest
   hasFrontCamera = await checkFrontCamera();
 
   // AdMob 초기화
@@ -85,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _alreadyPushed = false;
   bool _flashOn = false;
   bool _vibrateOn = true;
+  bool _keepScreenOn = true;
 
   @override
   void initState() {
@@ -92,7 +93,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (box != null) {
       _vibrateOn = box.get('vibrate') ?? true;
+      _keepScreenOn = box.get('keepTheScreenOn') ?? true;
     }
+
+    Screen.keepOn(_keepScreenOn);
   }
 
   /// QRView 생성
@@ -147,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               Get.to(SettingsPage(
                 useVibrate: _vibrateOn,
+                keepTheScreenOn: _keepScreenOn,
                 onSettingChange: (name, value) {
                   String cmd;
                   String text;
@@ -165,6 +170,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       box.put('vibrate', _vibrateOn);
                     }
                     return;
+                  } else if (name == 'keep the screen on') {
+                    _keepScreenOn = value as bool;
+                    Screen.keepOn(_keepScreenOn);
+                    if (box != null) {
+                      box.put('keepTheScreenOn', _keepScreenOn);
+                    }
                   } else {
                     return;
                   }

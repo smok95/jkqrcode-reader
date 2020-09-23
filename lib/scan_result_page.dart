@@ -1,8 +1,10 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flag/flag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jkqrcode/barcode_detail/country_info.dart';
+import 'package:jkqrcode/barcode_view_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'my_local.dart';
@@ -33,6 +35,7 @@ class ScanResultPage extends StatefulWidget {
 class _ScanResultPageState extends State<ScanResultPage> {
   bool _canLaunch = false;
   Widget _countries;
+  AdmobBanner _admobBanner;
 
   @override
   void initState() {
@@ -48,10 +51,10 @@ class _ScanResultPageState extends State<ScanResultPage> {
     if (widget.detail != null) {
       List<CountryInfo> countryInfos;
       if (widget.detail.format == BarcodeFormat.ean13) {
-        final info = widget.detail?.detail as EAN13Detail;
+        final info = widget.detail as EAN13Detail;
         countryInfos = info?.countries;
-      } else if (widget.detail.format == BarcodeFormat.upc_a) {
-        final info = widget.detail?.detail as UPCADetail;
+      } else if (widget.detail.format == BarcodeFormat.upcA) {
+        final info = widget.detail as UPCADetail;
         countryInfos = info?.countries;
       }
 
@@ -65,6 +68,8 @@ class _ScanResultPageState extends State<ScanResultPage> {
         );
       }
     }
+
+    _admobBanner = MyAdmob.createAdmobBanner2();
   }
 
   Widget _buildFlagWithName(final String code, final String name) {
@@ -128,7 +133,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
               Expanded(
                 child: _resultCard(widget.text, widget.format, suffix: suffix),
               ),
-              MyAdmob.createAdmobBanner2(),
+              _admobBanner,
               _controlPanel(widget.text),
             ])),
       ),
@@ -190,6 +195,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
 
   Widget _resultCard(String text, String format, {Widget suffix}) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Card(
             color: Colors.grey[100],
@@ -230,6 +236,18 @@ class _ScanResultPageState extends State<ScanResultPage> {
                 ),
               ),
             ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
+          child: FlatButton.icon(
+            icon: Icon(Icons.find_in_page),
+            label: Text(MyLocal.of(context).text('view code'),
+                style: TextStyle(fontSize: 17)),
+            onPressed: () {
+              Get.to(
+                  BarcodeViewPage(widget.detail, bottomAdBanner: _admobBanner));
+            },
           ),
         )
       ],

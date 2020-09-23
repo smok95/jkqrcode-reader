@@ -1,9 +1,11 @@
 import 'package:flutter_localized_country_name/flutter_localized_country_name.dart';
+import 'package:jkqrcode/barcode_detail/barcode_detail.dart';
 
 import 'country_info.dart';
 
-class EAN13Detail {
-  EAN13Detail(this.code, this.prefix, {this.countries});
+class EAN13Detail extends BarcodeDetail {
+  EAN13Detail(String code, this.prefix, {this.countries})
+      : super(BarcodeFormat.ean13, code);
 
   static Future<EAN13Detail> create(String code) async {
     final prefix = code.substring(0, 3);
@@ -23,7 +25,6 @@ class EAN13Detail {
 
   /// GS1 prefix
   final String prefix;
-  final String code;
 
   final List<CountryInfo> countries;
 }

@@ -14,7 +14,14 @@ class SettingsPage extends StatefulWidget {
   /// 진동기능 사용여부
   bool useVibrate;
 
-  SettingsPage({this.onToggleDarkMode, this.onSettingChange, this.useVibrate});
+  /// 화면 켜진 상태로 유지
+  bool keepTheScreenOn = false;
+
+  SettingsPage(
+      {this.onToggleDarkMode,
+      this.onSettingChange,
+      this.useVibrate,
+      this.keepTheScreenOn});
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -52,6 +59,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   },
                   switchValue: widget.useVibrate),
+              SettingsTile.switchTile(
+                  leading: Icon(Icons.settings_brightness),
+                  title: lo('keep the screen on'),
+                  onToggle: (value) {
+                    _fireChange('keep the screen on', value);
+                    setState(() {
+                      widget.keepTheScreenOn = value;
+                    });
+                  },
+                  switchValue: widget.keepTheScreenOn)
             ],
           ),
           SettingsSection(
