@@ -34,6 +34,7 @@ Future<bool> checkFrontCamera() async {
 
 bool hasFrontCamera = false;
 Box box;
+Settings settings = Settings();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,6 @@ void main() async {
 
   // AdMob 초기화
   MyAdmob.initialize();
-
   runApp(MyApp());
 }
 
@@ -79,24 +79,40 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+class Settings {
+  Settings() {
+    vibrateOn = true;
+    keepScreenOn = true;
+    openUrlAutomatically = false;
+  }
+
+  /// 진동 사용
+  bool vibrateOn;
+
+  /// 화면 켜진 상태 유지
+  bool keepScreenOn;
+
+  /// 웹페이지 자동으로 열기
+  bool openUrlAutomatically;
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   QRViewController _controller;
   final GlobalKey _qrKey = GlobalKey(debugLabel: 'QR');
   bool _alreadyPushed = false;
   bool _flashOn = false;
-  bool _vibrateOn = true;
-  bool _keepScreenOn = true;
 
   @override
   void initState() {
     super.initState();
 
     if (box != null) {
-      _vibrateOn = box.get('vibrate') ?? true;
-      _keepScreenOn = box.get('keepTheScreenOn') ?? true;
+      settings.vibrateOn = box.get('vibrate') ?? true;
+      settings.keepScreenOn = box.get('keepTheScreenOn') ?? true;
+      settings.openUrlAutomatically = box.get('urlAutoOpen') ?? false;
     }
 
-    Screen.keepOn(_keepScreenOn);
+    Screen.keepOn(settings.keepScreenOn);
   }
 
   /// QRView 생성
@@ -150,8 +166,9 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.more_vert),
             onPressed: () {
               Get.to(SettingsPage(
-                useVibrate: _vibrateOn,
-                keepTheScreenOn: _keepScreenOn,
+                useVibrate: settings.vibrateOn,
+                keepTheScreenOn: settings.keepScreenOn,
+                autoOpenWeb: settings.openUrlAutomatically,
                 onSettingChange: (name, value) {
                   String cmd;
                   String text;
@@ -165,16 +182,21 @@ class _MyHomePageState extends State<MyHomePage> {
                     cmd = 'open';
                     text = MyPrivateData.googlePlayDeveloperPageUrl;
                   } else if (name == 'vibrate') {
-                    _vibrateOn = value as bool;
+                    settings.vibrateOn = value as bool;
                     if (box != null) {
-                      box.put('vibrate', _vibrateOn);
+                      box.put('vibrate', settings.vibrateOn);
                     }
                     return;
                   } else if (name == 'keep the screen on') {
-                    _keepScreenOn = value as bool;
-                    Screen.keepOn(_keepScreenOn);
+                    settings.keepScreenOn = value as bool;
+                    Screen.keepOn(settings.keepScreenOn);
                     if (box != null) {
-                      box.put('keepTheScreenOn', _keepScreenOn);
+                      box.put('keepTheScreenOn', settings.keepScreenOn);
+                    }
+                  } else if (name == 'open website automatically') {
+                    settings.openUrlAutomatically = value as bool;
+                    if (box != null) {
+                      box.put('urlAutoOpen', settings.openUrlAutomatically);
                     }
                   } else {
                     return;
@@ -224,6 +246,15 @@ class _MyHomePageState extends State<MyHomePage> {
   void _showScanData(String format, String text) async {
     if (_alreadyPushed) return;
 
+    _vibrate();
+
+    if (settings.openUrlAutomatically) {
+      if (await canLaunch(text)) {
+        await launch(text);
+        return;
+      }
+    }
+
     _alreadyPushed = true;
 
     // 바코드 상세정보 생성
@@ -234,7 +265,6 @@ class _MyHomePageState extends State<MyHomePage> {
       print(e.toString());
     }
 
-    _vibrate();
     await Get.to(ScanResultPage(
         text: text, format: format, detail: info, onButtonPress: _runCommand));
 
@@ -266,7 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _vibrate() async {
-    if (!_vibrateOn) return;
+    if (!settings.vibrateOn) return;
 
     if (await Vibration.hasVibrator()) {
       Vibration.vibrate();

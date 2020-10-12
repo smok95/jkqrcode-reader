@@ -33,6 +33,7 @@ class ScanResultPage extends StatefulWidget {
 }
 
 class _ScanResultPageState extends State<ScanResultPage> {
+  /// url_launcher로 오픈가능한 문자열 여부
   bool _canLaunch = false;
   Widget _countries;
   AdmobBanner _admobBanner;
@@ -194,61 +195,66 @@ class _ScanResultPageState extends State<ScanResultPage> {
   }
 
   Widget _resultCard(String text, String format, {Widget suffix}) {
+    final style = TextStyle(
+        color: _canLaunch ? Colors.blue : Colors.black,
+        fontSize: 17,
+        decoration:
+            _canLaunch ? TextDecoration.underline : TextDecoration.none);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Card(
             color: Colors.grey[100],
             child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.format,
-                        style: TextStyle(
-                            fontSize: 20.0, fontWeight: FontWeight.bold),
-                      ),
-                      if (suffix != null) suffix,
-                    ]),
-                margin: EdgeInsets.all(10),
-              ),
-            )),
+                alignment: Alignment.centerLeft,
+                child: Container(
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.format,
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
+                          ),
+                          if (suffix != null) suffix
+                        ]),
+                    margin: EdgeInsets.all(10)))),
         Expanded(
           child: Card(
-            child: SingleChildScrollView(
+            child: Scrollbar(
+                child: SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.all(10.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    TextField(
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none),
-                      readOnly: true,
-                      maxLines: null,
-                      controller: TextEditingController(text: widget.text),
+                    SelectableText(
+                      widget.text,
+                      style: style,
+                      onTap: () {
+                        if (_canLaunch) {
+                          _fireButtonPress('open');
+                        }
+                      },
                     ),
                   ],
                 ),
               ),
-            ),
+            )),
           ),
         ),
         Padding(
           padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
           child: FlatButton.icon(
-            icon: Icon(Icons.find_in_page),
-            label: Text(MyLocal.of(context).text('view code'),
-                style: TextStyle(fontSize: 17)),
-            onPressed: () {
-              Get.to(
-                  BarcodeViewPage(widget.detail, bottomAdBanner: _admobBanner));
-            },
-          ),
+              icon: Icon(Icons.find_in_page),
+              label: Text(MyLocal.of(context).text('view code'),
+                  style: TextStyle(fontSize: 17)),
+              onPressed: () {
+                Get.to(BarcodeViewPage(widget.detail,
+                    bottomAdBanner: _admobBanner));
+              }),
         )
       ],
     );

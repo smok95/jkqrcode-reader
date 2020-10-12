@@ -17,10 +17,14 @@ class SettingsPage extends StatefulWidget {
   /// 화면 켜진 상태로 유지
   bool keepTheScreenOn = false;
 
+  /// 웹페이지 자동으로 열기
+  bool autoOpenWeb = false;
+
   SettingsPage(
       {this.onToggleDarkMode,
       this.onSettingChange,
       this.useVibrate,
+      this.autoOpenWeb,
       this.keepTheScreenOn});
 
   @override
@@ -68,7 +72,17 @@ class _SettingsPageState extends State<SettingsPage> {
                       widget.keepTheScreenOn = value;
                     });
                   },
-                  switchValue: widget.keepTheScreenOn)
+                  switchValue: widget.keepTheScreenOn),
+              SettingsTile.switchTile(
+                  leading: Icon(Icons.open_in_browser),
+                  title: lo('open website automatically'),
+                  onToggle: (value) {
+                    _fireChange('open website automatically', value);
+                    setState(() {
+                      widget.autoOpenWeb = value;
+                    });
+                  },
+                  switchValue: widget.autoOpenWeb)
             ],
           ),
           SettingsSection(
@@ -97,10 +111,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 title: lo('app info'),
                 onTap: () async {
                   PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
                   showAboutDialog(
-                      context: context,
-                      applicationName: packageInfo.appName,
-                      applicationVersion: packageInfo.version);
+                    context: context,
+                    applicationName: packageInfo.appName,
+                    applicationVersion: packageInfo.version,
+                  );
                 },
               ),
             ],
