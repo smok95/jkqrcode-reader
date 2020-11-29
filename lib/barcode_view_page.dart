@@ -1,22 +1,21 @@
+import 'package:barcode_info/barcode_info.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:jkqrcode/barcode_detail/barcode_detail.dart';
-import 'package:jkqrcode/my_local.dart';
+import 'package:get/get.dart';
 
 class BarcodeViewPage extends StatelessWidget {
-  final BarcodeDetail data;
+  final BarcodeInfo data;
   final Widget bottomAdBanner;
   BarcodeViewPage(this.data, {this.bottomAdBanner});
 
   @override
   Widget build(BuildContext context) {
-    final lo = MyLocal.of(context).text;
     final barcode = _getBarcode();
     final barcodeWidget = barcode != null
         ? BarcodeWidget(data: data.code, barcode: barcode)
         : Text('Unsupported barcode');
     return Scaffold(
-      appBar: AppBar(title: Text(lo('view code'))),
+      appBar: AppBar(title: Text('view code'.tr)),
       backgroundColor: Colors.black,
       body: SafeArea(
           child: Column(

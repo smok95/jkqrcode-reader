@@ -1,16 +1,14 @@
 import 'package:admob_flutter/admob_flutter.dart';
+import 'package:barcode_info/barcode_info.dart';
 import 'package:flag/flag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jkqrcode/barcode_detail/country_info.dart';
 import 'package:jkqrcode/barcode_view_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'my_local.dart';
 import 'my_admob.dart';
 import 'my_icon_button.dart' as my;
-import 'barcode_detail/barcode_detail.dart';
 
 /// 버튼 터치 이벤트
 /// 버튼 터치시 해당 이벤트가 발생하며, [buttonName]과 스캔값인 [text]가 인자로 전달된다.
@@ -21,7 +19,7 @@ class ScanResultPage extends StatefulWidget {
   final String text;
   // 스캔코드 형식
   final String format;
-  final BarcodeDetail detail;
+  final BarcodeInfo detail;
   final ButtonPressCallback onButtonPress;
 
   ScanResultPage(
@@ -52,10 +50,10 @@ class _ScanResultPageState extends State<ScanResultPage> {
     if (widget.detail != null) {
       List<CountryInfo> countryInfos;
       if (widget.detail.format == BarcodeFormat.ean13) {
-        final info = widget.detail as EAN13Detail;
+        final info = widget.detail as EAN13Info;
         countryInfos = info?.countries;
       } else if (widget.detail.format == BarcodeFormat.upcA) {
-        final info = widget.detail as UPCADetail;
+        final info = widget.detail as UPCAInfo;
         countryInfos = info?.countries;
       }
 
@@ -97,8 +95,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lo = MyLocal.of(context).text;
-    final String title = lo('scan result');
+    final String title = 'scan result'.tr;
     Widget suffix;
     if (_countries != null) {
       suffix = GestureDetector(
@@ -108,7 +105,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
               title: "Infomation",
               content: Padding(
                   padding: EdgeInsets.all(5),
-                  child: Text(lo('ean13 country flag notice'))));
+                  child: Text('ean13 country flag notice'.tr)));
           /*
           Get.snackbar(
               'EAN13 GS1 Company Prefix', lo('ean13 country flag notice'),
@@ -148,10 +145,10 @@ class _ScanResultPageState extends State<ScanResultPage> {
   }
 
   Widget _controlPanel(String text) {
-    final copy = MyLocal.of(context).copy;
-    final share = MyLocal.of(context).share;
-    final search = MyLocal.of(context).search;
-    final open = MyLocal.of(context).open;
+    final copy = 'copy'.tr;
+    final share = 'share'.tr;
+    final search = 'search'.tr;
+    final open = 'open'.tr;
     final iconSize = 40.0;
 
     List<Widget> children = List<Widget>();
@@ -249,8 +246,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
           padding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
           child: FlatButton.icon(
               icon: Icon(Icons.find_in_page),
-              label: Text(MyLocal.of(context).text('view code'),
-                  style: TextStyle(fontSize: 17)),
+              label: Text('view code'.tr, style: TextStyle(fontSize: 17)),
               onPressed: () {
                 Get.to(BarcodeViewPage(widget.detail,
                     bottomAdBanner: _admobBanner));

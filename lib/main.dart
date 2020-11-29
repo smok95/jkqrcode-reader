@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 
+import 'package:barcode_info/barcode_info.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_jk/flutter_jk.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,11 +16,9 @@ import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 
-import 'barcode_detail/barcode_detail.dart';
 import 'my_private_data.dart';
 import 'settings_page.dart';
 import 'my_admob.dart';
-import 'my_local.dart';
 import 'scan_result_page.dart';
 import 'my_theme.dart';
 
@@ -59,14 +59,23 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
+    final messages = GetxMessages();
+    messages.add('en_US', 'title', 'JK QRCode Reader');
+    messages.add('ko_KR', 'title', 'JK QR코드 리더');
+    messages.add('pl_PL', 'title', 'JK QRCode Reader');
+
+    messages.add('en_US', 'ean13 country flag notice',
+        'The first three digits of the EAN-13 (GS1 Prefix) usually identify the GS1 Member Organization which the manufacturer has joined\n(not necessarily where the product is actually made).');
+    messages.add('ko_KR', 'ean13 country flag notice',
+        '현재 표시된 국기는 바코드를 발급한 국가(또는 지역)의 정보이며, 제품의 원산지 정보는 아닙니다.');
+    messages.add('pl_PL', 'ean13 country flag notice',
+        'The first three digits of the EAN-13 (GS1 Prefix) usually identify the GS1 Member Organization which the manufacturer has joined\n(not necessarily where the product is actually made).');
+
     return GetMaterialApp(
-      onGenerateTitle: (BuildContext context) => MyLocal.of(context).title,
-      localizationsDelegates: [
-        const MyLocalDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      supportedLocales: [const Locale('en', ''), const Locale('ko', '')],
+      translations: messages,
+      onGenerateTitle: (BuildContext context) => 'title'.tr,
+      locale: ui.window.locale,
+      fallbackLocale: Locale('en', 'US'),
       theme: myTheme,
       home: MyHomePage(),
     );
@@ -160,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(MyLocal.of(context).title),
+        title: Text('title'.tr),
         actions: actions,
         leading: IconButton(
             icon: Icon(Icons.more_vert),
@@ -232,8 +241,8 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         break;
       case 'search':
-        final google = MyLocal.of(context).google_url;
-        final encoded = Uri.encodeFull('https://${google}/search?q=${text}');
+        final google = 'google url'.tr;
+        final encoded = Uri.encodeFull('https://$google/search?q=$text');
         if (await canLaunch(encoded)) {
           await launch(encoded);
         }
@@ -258,9 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _alreadyPushed = true;
 
     // 바코드 상세정보 생성
-    BarcodeDetail info;
+    BarcodeInfo info;
     try {
-      info = await BarcodeDetail.create(format, text);
+      info = await BarcodeInfo.create(format, text);
     } catch (e) {
       print(e.toString());
     }

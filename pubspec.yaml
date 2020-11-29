@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.6.0+7
+version: 1.6.1+8
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -26,7 +26,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-
+  barcode_info:
+    git: 
+      url: https://github.com/smok95/barcode_info.git
+      ref: de105ea2f2e1a0a7a20ce9ddcc28ec2adcb5e33f # 0.0.3
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3  
@@ -42,7 +45,7 @@ dependencies:
   flutter_localized_country_name: ^0.0.1
   date_format: ^1.0.9
   vibration: ^1.4.0
-  get: ^3.4.1
+  get: ^3.17.1
   hive: ^1.4.4
   hive_flutter: ^0.3.1
   barcode_widget: ^1.5.0
@@ -51,6 +54,12 @@ dependencies:
     git:
       url: https://github.com/smok95/flag_flutter.git
       ref: 573609da7f4763105e87ccca7b4928064a243fbd
+  
+  flutter_jk:
+    path: E:/dev/flutter_jk
+    #git:
+    #  url: https://github.com/smok95/flutter_jk.git
+    #  ref: 5573e7334496d93044bdcbed7d38aee746a314b2 # 0.1.1
 
 dev_dependencies:
   flutter_test:

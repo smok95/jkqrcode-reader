@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:settings_ui/settings_ui.dart';
-
-import 'my_local.dart';
+import 'package:get/get.dart';
 
 typedef DarkModeCallback = void Function(bool darkMode);
 typedef SettingChangeCallback = void Function(String name, dynamic value);
@@ -40,12 +39,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lo = MyLocal.of(context).text;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          lo('settings'),
+          'settings'.tr,
         ),
       ),
       body: SettingsList(
@@ -55,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
             tiles: [
               SettingsTile.switchTile(
                   leading: Icon(Icons.vibration),
-                  title: lo('vibrate'),
+                  title: 'vibrate'.tr,
                   onToggle: (use) {
                     setState(() {
                       widget.useVibrate = use;
@@ -65,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   switchValue: widget.useVibrate),
               SettingsTile.switchTile(
                   leading: Icon(Icons.settings_brightness),
-                  title: lo('keep the screen on'),
+                  title: 'keep the screen on'.tr,
                   onToggle: (value) {
                     _fireChange('keep the screen on', value);
                     setState(() {
@@ -75,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   switchValue: widget.keepTheScreenOn),
               SettingsTile.switchTile(
                   leading: Icon(Icons.open_in_browser),
-                  title: lo('open website automatically'),
+                  title: 'open website automatically'.tr,
                   onToggle: (value) {
                     _fireChange('open website automatically', value);
                     setState(() {
@@ -90,25 +87,25 @@ class _SettingsPageState extends State<SettingsPage> {
             tiles: [
               SettingsTile(
                   leading: Icon(Icons.rate_review),
-                  title: lo('rate review'),
+                  title: 'rate review'.tr,
                   onTap: () {
                     _fireChange('rate review', null);
                   }),
               SettingsTile(
                   leading: Icon(Icons.share),
-                  title: lo('share app'),
+                  title: 'share app'.tr,
                   onTap: () {
                     _fireChange('share app', null);
                   }),
               SettingsTile(
                   leading: Icon(Icons.apps),
-                  title: lo('more apps'),
+                  title: 'more apps'.tr,
                   onTap: () {
                     _fireChange('more apps', null);
                   }),
               SettingsTile(
                 leading: Icon(Icons.info_outline),
-                title: lo('app info'),
+                title: 'app info'.tr,
                 onTap: () async {
                   PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
