@@ -26,13 +26,13 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: de105ea2f2e1a0a7a20ce9ddcc28ec2adcb5e33f
-      resolved-ref: de105ea2f2e1a0a7a20ce9ddcc28ec2adcb5e33f
+      ref: c4e35e878e3670cc7b3fda5ed8ac044b6c2d8ea6
+      resolved-ref: c4e35e878e3670cc7b3fda5ed8ac044b6c2d8ea6
       url: "https://github.com/smok95/barcode_info.git"
     source: git
-    version: "0.0.3"
+    version: "0.0.5"
   barcode_widget:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: barcode_widget
       url: "https://pub.dartlang.org"

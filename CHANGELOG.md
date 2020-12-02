@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - localization방식 LocalizationsDelegate에서 GetX 로 변경
 - get 3.4.1 -> 3.17.1
 - BarcodeDetail 별도 pakcage로 분리(BarcodeInfo)
+- BarcodeViewPage에서 body부분 BarcodeView로 분리 후 BarcodeInfo로 이전
 
 ## 1.6.0 - 2020-10-11
 ### Added
