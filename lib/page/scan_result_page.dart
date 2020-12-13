@@ -4,27 +4,34 @@ import 'package:flag/flag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jkqrcode/barcode_view_page.dart';
+import 'package:jkqrcode/controller/scan_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'my_admob.dart';
-import 'my_icon_button.dart' as my;
+import '../my_admob.dart';
+import '../my_icon_button.dart' as my;
+import 'barcode_view_page.dart';
 
 /// 버튼 터치 이벤트
 /// 버튼 터치시 해당 이벤트가 발생하며, [buttonName]과 스캔값인 [text]가 인자로 전달된다.
 typedef ButtonPressCallback = void Function(String buttonName, String text);
 
 class ScanResultPage extends StatefulWidget {
-  /// 스캔결과 값
-  final String text;
   // 스캔코드 형식
   final String format;
-  final BarcodeInfo detail;
+  final BarcodeInfo data;
   final ButtonPressCallback onButtonPress;
 
   ScanResultPage(
-      {Key key, this.text, this.format, this.onButtonPress, this.detail})
+      {Key key, @required this.data, this.format, this.onButtonPress})
       : super(key: key);
+
+  factory ScanResultPage.route() {
+    final args = Get.arguments;
+    final data = args == null ? null : args['data'];
+    final callback = args == null ? null : args['onButtonPress'];
+
+    return ScanResultPage(data: data, onButtonPress: callback);
+  }
 
   @override
   _ScanResultPageState createState() => _ScanResultPageState();
@@ -41,30 +48,35 @@ class _ScanResultPageState extends State<ScanResultPage> {
     super.initState();
 
     // url_launcher로 오픈가능한 문자열인지 확인
-    canLaunch(widget.text).then((value) {
+    canLaunch(widget.data.code).then((value) {
       setState(() {
         _canLaunch = value;
       });
     });
 
-    if (widget.detail != null) {
-      List<CountryInfo> countryInfos;
-      if (widget.detail.format == BarcodeFormat.ean13) {
-        final info = widget.detail as EAN13Info;
-        countryInfos = info?.countries;
-      } else if (widget.detail.format == BarcodeFormat.upcA) {
-        final info = widget.detail as UPCAInfo;
-        countryInfos = info?.countries;
+    if (widget.data != null) {
+      Set<String> countryCodes;
+      if (widget.data.format == BarcodeFormat.ean13) {
+        final info = widget.data as EAN13Info;
+        countryCodes = info?.countryCodes;
+      } else if (widget.data.format == BarcodeFormat.upcA) {
+        final info = widget.data as UPCAInfo;
+        countryCodes = info?.countryCodes;
       }
 
-      if (countryInfos != null) {
-        _countries = Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: countryInfos
-              .map((country) => _buildFlagWithName(country.code, country.name))
-              .toList(),
-        );
+      if (countryCodes != null && countryCodes.length > 0) {
+        ScanController.fetchCountryInfos(countryCodes).then((countryInfos) {
+          setState(() {
+            _countries = Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: countryInfos
+                  .map((country) =>
+                      _buildFlagWithName(country.code, country.name))
+                  .toList(),
+            );
+          });
+        });
       }
     }
 
@@ -102,22 +114,18 @@ class _ScanResultPageState extends State<ScanResultPage> {
         child: _countries,
         onTap: () {
           Get.defaultDialog(
-              title: "Infomation",
+              title: 'Information'.tr,
               content: Padding(
                   padding: EdgeInsets.all(5),
                   child: Text('ean13 country flag notice'.tr)));
-          /*
-          Get.snackbar(
-              'EAN13 GS1 Company Prefix', lo('ean13 country flag notice'),
-              duration: Duration(seconds: 20),
-              icon: Icon(Icons.info_outline),
-              shouldIconPulse: false,
-              mainButton: FlatButton(
-                  onPressed: () => Get.back(), child: Icon(Icons.close)));
-                  */
         },
       );
     }
+
+    final code = widget.data.code;
+    final format = widget.format == null
+        ? widget.data.formatToString().toUpperCase()
+        : widget.format;
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -129,10 +137,10 @@ class _ScanResultPageState extends State<ScanResultPage> {
             margin: EdgeInsets.all(10.0),
             child: Column(children: [
               Expanded(
-                child: _resultCard(widget.text, widget.format, suffix: suffix),
+                child: _resultCard(code, format, suffix: suffix),
               ),
               _admobBanner,
-              _controlPanel(widget.text),
+              _controlPanel(),
             ])),
       ),
     );
@@ -140,11 +148,11 @@ class _ScanResultPageState extends State<ScanResultPage> {
 
   void _fireButtonPress(String buttonName) {
     if (widget.onButtonPress != null) {
-      widget.onButtonPress(buttonName, widget.text);
+      widget.onButtonPress(buttonName, widget.data.code);
     }
   }
 
-  Widget _controlPanel(String text) {
+  Widget _controlPanel() {
     final copy = 'copy'.tr;
     final share = 'share'.tr;
     final search = 'search'.tr;
@@ -191,7 +199,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
     );
   }
 
-  Widget _resultCard(String text, String format, {Widget suffix}) {
+  Widget _resultCard(String code, String format, {Widget suffix}) {
     final style = TextStyle(
         color: _canLaunch ? Colors.blue : Colors.black,
         fontSize: 17,
@@ -210,7 +218,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            widget.format,
+                            format,
                             style: TextStyle(
                                 fontSize: 20.0, fontWeight: FontWeight.bold),
                           ),
@@ -228,7 +236,7 @@ class _ScanResultPageState extends State<ScanResultPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SelectableText(
-                      widget.text,
+                      widget.data.code,
                       style: style,
                       onTap: () {
                         if (_canLaunch) {
@@ -248,8 +256,8 @@ class _ScanResultPageState extends State<ScanResultPage> {
               icon: Icon(Icons.find_in_page),
               label: Text('view code'.tr, style: TextStyle(fontSize: 17)),
               onPressed: () {
-                Get.to(BarcodeViewPage(widget.detail,
-                    bottomAdBanner: _admobBanner));
+                Get.to(
+                    BarcodeViewPage(widget.data, bottomAdBanner: _admobBanner));
               }),
         )
       ],

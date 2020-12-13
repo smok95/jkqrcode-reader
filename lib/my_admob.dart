@@ -19,11 +19,11 @@ class MyAdmob {
 
   static String get appId => MyPrivateData.adMobAppId;
   static String get unitId {
-    return Foundation.kDebugMode ? testAdUnitId : MyPrivateData.AdMobUnitId1;
+    return Foundation.kDebugMode ? testAdUnitId : MyPrivateData.adMobUnitId1;
   }
 
   static String get unitId2 {
-    return Foundation.kDebugMode ? testAdUnitId : MyPrivateData.AdmobUnitId2;
+    return Foundation.kDebugMode ? testAdUnitId : MyPrivateData.admobUnitId2;
   }
 
   /// Admob 배너 생성
