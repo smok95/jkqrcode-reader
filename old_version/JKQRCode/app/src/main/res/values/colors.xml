@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorPrimary">#f6c820</color>
-    <color name="colorPrimaryDark">#bc991d</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorPopupBack">#64b5f6</color>
-    <color name="colorScanBorder">#304ffe</color>
-    <color name="colorScanLaser">#dc7916</color>
-</resources>
